@@ -1,0 +1,4 @@
+.gradle
+*.so
+android/build
+/target

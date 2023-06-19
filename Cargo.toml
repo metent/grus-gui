@@ -1,0 +1,41 @@
+# This file is part of grus-gui, a hierarchical task management application.
+# Copyright (C) 2023 Rishabh Das
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+[package]
+name = "grus-gui"
+version = "0.0.0"
+edition = "2021"
+license = "GPL-3.0-only"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.26"
+dirs = "5.0.1"
+eframe = { version = "0.22.0", features = [ "wgpu" ] }
+egui = "0.22.0"
+epaint = "0.22.0"
+grus-lib = { git = "https://github.com/metent/grus-lib.git" }
+grus-gui-lib = { git = "https://github.com/metent/grus-gui-lib.git" }
+num-traits = "0.2.15"
+thiserror = "1.0.40"
+winit = { version = "0.28.6", features = [ "android-native-activity" ] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "0.21.1"
+
+[lib]
+crate_type = ["lib", "cdylib"]
