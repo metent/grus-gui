@@ -39,6 +39,7 @@ pub struct Grus {
 	stack: Vec<(u64, u64)>,
 	todo: Action,
 	vboard_text: String,
+	vboard_caps: bool,
 	start_date: NaiveDateTime,
 	end_date: NaiveDateTime,
 	#[cfg(target_os = "android")] jniwr: JniWrapper,
@@ -60,6 +61,7 @@ impl Grus {
 			stack: Vec::new(),
 			todo: Action::None,
 			vboard_text: "".into(),
+			vboard_caps: false,
 			start_date: NaiveDateTime::default(),
 			end_date: NaiveDateTime::default(),
 			#[cfg(target_os = "android")] jniwr,
@@ -186,7 +188,12 @@ impl App for Grus {
 					let mut output = TextEdit::singleline(&mut self.vboard_text)
 						.desired_width(f32::INFINITY)
 						.show(ui);
-					if let Some(key) = ui.vboard() {
+					let res = if self.vboard_caps {
+						ui.caps_vboard()
+					} else {
+						ui.vboard()
+					};
+					if let Some(key) = res {
 						output.response.request_focus();
 						match key {
 							Key::Char(c) => {
@@ -214,6 +221,9 @@ impl App for Grus {
 									output.state.set_ccursor_range(Some(CCursorRange::one(ccursor)));
 									output.state.store(ctx, output.response.id);
 								}
+							}
+							Key::CapsLock => {
+								self.vboard_caps = !self.vboard_caps;
 							}
 						}
 					}

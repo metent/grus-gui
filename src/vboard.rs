@@ -18,33 +18,59 @@ use egui::{Button, RichText, Ui, Vec2};
 
 pub trait VBoard {
 	fn vboard(&mut self) -> Option<Key>;
+	fn caps_vboard(&mut self) -> Option<Key>;
 }
 
 impl VBoard for Ui {
 	fn vboard(&mut self) -> Option<Key> {
-		let key0 = self.row(&["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="], Some((Key::Backspace, 40.0)));
-		let key1 = self.row(&["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], None);
-		let key2 = self.row(&["a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'"], None);
-		let key3 = self.row(&["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"], None);
-		let key4 = self.row(&[" "], Some((Key::Enter, 30.0)));
+		let key0 = self.row(None, &["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="], Some((Key::Backspace, 40.0)));
+		let key1 = self.row(None, &["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"], None);
+		let key2 = self.row(Some((Key::CapsLock, 40.0)), &["a", "s", "d", "f", "g", "h", "j", "k", "l", ";", "'"], None);
+		let key3 = self.row(None, &["z", "x", "c", "v", "b", "n", "m", ",", ".", "/"], None);
+		let key4 = self.row(None, &[" "], Some((Key::Enter, 30.0)));
+		key0.or(key1).or(key2).or(key3).or(key4)
+	}
+
+	fn caps_vboard(&mut self) -> Option<Key> {
+		let key0 = self.row(None, &["!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "+"], Some((Key::Backspace, 40.0)));
+		let key1 = self.row(None, &["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], None);
+		let key2 = self.row(Some((Key::CapsLock, 40.0)), &["A", "S", "D", "F", "G", "H", "J", "K", "L", ";", "'"], None);
+		let key3 = self.row(None, &["Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"], None);
+		let key4 = self.row(None, &[" "], Some((Key::Enter, 30.0)));
 		key0.or(key1).or(key2).or(key3).or(key4)
 	}
 }
 
 trait VBoardExt {
-	fn row(&mut self, keys: &[&str], end: Option<(Key, f32)>) -> Option<Key>;
+	fn row(&mut self, start: Option<(Key, f32)>, keys: &[&str], end: Option<(Key, f32)>) -> Option<Key>;
 }
 
 impl VBoardExt for Ui {
-	fn row(&mut self, keys: &[&str], end: Option<(Key, f32)>) -> Option<Key> {
+	fn row(&mut self, start: Option<(Key, f32)>, keys: &[&str], end: Option<(Key, f32)>) -> Option<Key> {
+		let (start_key, start_width) = match start {
+			Some((start_key, start_width)) => (Some(start_key), start_width),
+			None => (None, 0.),
+		};
 		let (end_key, end_width) = match end {
 			Some((end_key, end_width)) => (Some(end_key), end_width),
 			None => (None, 0.),
 		};
-		let width = self.available_width() - end_width;
+		let width = self.available_width() - start_width - end_width;
 		let mut pressed = None;
 		self.horizontal(|ui| {
 			ui.spacing_mut().item_spacing.x = 0.0;
+			if let Some(start_key) = start_key {
+				let size = Vec2::new(start_width, ui.available_height());
+				let (_, rect) = ui.allocate_space(size);
+				let btn_txt = match start_key {
+					Key::CapsLock => "Caps",
+					_ => unimplemented!(),
+				};
+				let btn = Button::new(RichText::new(btn_txt).size(20.0)).min_size(size);
+				if ui.put(rect, btn).clicked() {
+					pressed = Some(start_key);
+				}
+			}
 			for key in keys {
 				let size = Vec2::new(width / keys.len() as f32, ui.available_height());
 				let (_, rect) = ui.allocate_space(size);
@@ -57,9 +83,9 @@ impl VBoardExt for Ui {
 				let size = Vec2::new(end_width, ui.available_height());
 				let (_, rect) = ui.allocate_space(size);
 				let btn_txt = match end_key {
-					Key::Char(c) => unimplemented!(),
 					Key::Enter => ">",
 					Key::Backspace => "<-",
+					_ => unimplemented!(),
 				};
 				let btn = Button::new(RichText::new(btn_txt).size(20.0)).min_size(size);
 				if ui.put(rect, btn).clicked() {
@@ -75,4 +101,5 @@ pub enum Key {
 	Char(char),
 	Enter,
 	Backspace,
+	CapsLock,
 }
