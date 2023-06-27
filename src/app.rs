@@ -185,9 +185,16 @@ impl App for Grus {
 		TopBottomPanel::bottom("vboard").show_animated(ctx, show_vboard, |ui| {
 			match self.todo {
 				Action::Add(_, _) | Action::Rename => {
-					let mut output = TextEdit::singleline(&mut self.vboard_text)
-						.desired_width(f32::INFINITY)
-						.show(ui);
+					let mut output = ui.horizontal(|ui| {
+						if ui.button("<-").clicked() {
+							self.todo = Action::None;
+							self.tree.highlighted = None;
+							self.vboard_text.clear();
+						}
+						TextEdit::singleline(&mut self.vboard_text)
+							.desired_width(f32::INFINITY)
+							.show(ui)
+					}).inner;
 					let res = if self.vboard_caps {
 						ui.caps_vboard()
 					} else {
@@ -230,6 +237,11 @@ impl App for Grus {
 				}
 				Action::SetDueDate => {
 					ui.horizontal(|ui| {
+						if ui.button("<-").clicked() {
+							self.todo = Action::None;
+							self.tree.highlighted = None;
+							self.vboard_text.clear();
+						}
 						ui.add(DatePicker::<Range<NaiveDateTime>>::new(
 							"duedate",
 							&mut self.end_date,
@@ -243,6 +255,11 @@ impl App for Grus {
 				},
 				Action::AddSession => {
 					ui.horizontal(|ui| {
+						if ui.button("<-").clicked() {
+							self.todo = Action::None;
+							self.tree.highlighted = None;
+							self.vboard_text.clear();
+						}
 						ui.add(DatePicker::<Range<NaiveDateTime>>::new(
 							"startdate",
 							&mut self.start_date,
