@@ -66,7 +66,7 @@ impl VBoardExt for Ui {
 					Key::CapsLock => "Caps",
 					_ => unimplemented!(),
 				};
-				let btn = Button::new(RichText::new(btn_txt).size(20.0)).min_size(size);
+				let btn = Button::new(RichText::new(btn_txt).size(10.0)).min_size(size);
 				if ui.put(rect, btn).clicked() {
 					pressed = Some(start_key);
 				}
@@ -74,7 +74,7 @@ impl VBoardExt for Ui {
 			for key in keys {
 				let size = Vec2::new(width / keys.len() as f32 - 5.0, ui.available_height());
 				let (_, rect) = ui.allocate_space(size);
-				let btn = Button::new(RichText::new(*key).size(20.0)).min_size(size);
+				let btn = Button::new(RichText::new(*key).size(10.0)).min_size(size);
 				if ui.put(rect, btn).clicked() {
 					pressed = key.chars().nth(0).map(|c| Key::Char(c));
 				}
@@ -87,7 +87,7 @@ impl VBoardExt for Ui {
 					Key::Backspace => "<-",
 					_ => unimplemented!(),
 				};
-				let btn = Button::new(RichText::new(btn_txt).size(20.0)).min_size(size);
+				let btn = Button::new(RichText::new(btn_txt).size(10.0)).min_size(size);
 				if ui.put(rect, btn).clicked() {
 					pressed = Some(end_key);
 				}
