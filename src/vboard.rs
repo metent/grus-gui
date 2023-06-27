@@ -48,19 +48,19 @@ trait VBoardExt {
 impl VBoardExt for Ui {
 	fn row(&mut self, start: Option<(Key, f32)>, keys: &[&str], end: Option<(Key, f32)>) -> Option<Key> {
 		let (start_key, start_width) = match start {
-			Some((start_key, start_width)) => (Some(start_key), start_width),
+			Some((start_key, start_width)) => (Some(start_key), start_width + 5.0),
 			None => (None, 0.),
 		};
 		let (end_key, end_width) = match end {
-			Some((end_key, end_width)) => (Some(end_key), end_width),
+			Some((end_key, end_width)) => (Some(end_key), end_width + 5.0),
 			None => (None, 0.),
 		};
 		let width = self.available_width() - start_width - end_width;
 		let mut pressed = None;
 		self.horizontal(|ui| {
-			ui.spacing_mut().item_spacing.x = 0.0;
+			ui.spacing_mut().item_spacing.x = 5.0;
 			if let Some(start_key) = start_key {
-				let size = Vec2::new(start_width, ui.available_height());
+				let size = Vec2::new(start_width - 5.0, ui.available_height());
 				let (_, rect) = ui.allocate_space(size);
 				let btn_txt = match start_key {
 					Key::CapsLock => "Caps",
@@ -72,7 +72,7 @@ impl VBoardExt for Ui {
 				}
 			}
 			for key in keys {
-				let size = Vec2::new(width / keys.len() as f32, ui.available_height());
+				let size = Vec2::new(width / keys.len() as f32 - 5.0, ui.available_height());
 				let (_, rect) = ui.allocate_space(size);
 				let btn = Button::new(RichText::new(*key).size(20.0)).min_size(size);
 				if ui.put(rect, btn).clicked() {
@@ -80,7 +80,7 @@ impl VBoardExt for Ui {
 				}
 			}
 			if let Some(end_key) = end_key {
-				let size = Vec2::new(end_width, ui.available_height());
+				let size = Vec2::new(end_width - 5.0, ui.available_height());
 				let (_, rect) = ui.allocate_space(size);
 				let btn_txt = match end_key {
 					Key::Enter => ">",
